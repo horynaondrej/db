@@ -1,0 +1,6 @@
+create or replace table t (
+    id integer,
+    datum timestamp,
+    nazev varchar,
+    mer decimal(18, 3)
+);
