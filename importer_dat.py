@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""modul slouží pro import dat do databáze 
+"""modul slouží pro import dat do databáze
 duckdb"""
 
 import os
@@ -19,7 +19,7 @@ spec.loader.exec_module(config)
 
 
 class ImporterDat:
-    """odesílá sql příkazy pro smazání a vytvoření 
+    """odesílá sql příkazy pro smazání a vytvoření
     tabulky v databázi, importuje data"""
 
     def __init__(self):
@@ -70,6 +70,16 @@ class ImporterDat:
             """
         )
 
+    def odeber_docasne_soubory(self):
+        """odeber již nepotřebné soubory (už byly nahrané
+        do databáze)"""
+        if os.path.exists(self.tmp):
+            os.remove(self.tmp)
+            logging.info("Soubor tmp.csv byl úspěšně smazán")
+        else:
+            logging.info("Soubor neexistuje")
+
+
 def main():
     """Hlavní funkce skriptu, která inicializuje a spouští procesy."""
     fmt = "%(asctime)s: %(message)s"
@@ -84,6 +94,7 @@ def main():
     importer_dat.vytvor_tabulku()
     importer_dat.nahraj_data()
     importer_dat.odpoj_se_od_databaze()
+    importer_dat.odeber_docasne_soubory()
 
     logging.info("Ukončení skriptu")
 
