@@ -45,6 +45,7 @@ class TvurceSQL:
     def nacti_data(self):
         """Načte obsah datového souboru a uloží jej do atributu content"""
         try:
+            logging.info("Otevírám soubor %s", self.vstup)
             with open(self.vstup, "r+", newline="", encoding="utf8") as soubor:
                 a = 0
                 cteni = csv.reader(
@@ -95,9 +96,13 @@ class TvurceSQL:
     def zjisti_typ_hodnoty(self, hodnota: Any) -> str:
         """funkce pro přetypování konkrétn hodnoty"""
         res = ""
+        # když je hodnota 0 nebo null, tak ji nebude
+        # brát do statistiky
+        if hodnota in ("0", ""):
+            res = "null"
         # když sloupec obsahuje více znaků tečka ".",
         # tak se přetypuje na datum
-        if "." in hodnota and len(hodnota.split(".")) == 3 and not ":" in hodnota:
+        elif "." in hodnota and len(hodnota.split(".")) == 3 and not ":" in hodnota:
             # přetypuj na datum
             try:
                 self.pretypuj_datum(hodnota)
@@ -105,7 +110,7 @@ class TvurceSQL:
             except ValueError:
                 res = "varchar"
         elif ":" in hodnota:
-            # přetypuj na timestamp
+            # přetypuj na timestamp protože má hodnota i čas
             try:
                 self.pretypuj_datum(hodnota)
                 res = "timestamp"
@@ -151,8 +156,25 @@ class TvurceSQL:
 
         # výpis nejčastější hodnoty pro každý sloupec
         for _, col in enumerate(columns):
+
+            # hodnota s největší četností
             most_common = Counter(col).most_common(1)[0]
-            self.deklarace.append(most_common[0])
+            res = most_common[0]
+            # když bude v jedné hodnotě číslo decimal, a jinde 0 nebo null,
+            # tak bude typ decimal
+            if any(x.startswith('decimal') for x in col):
+                res = "decimal(18, 3)"
+            # když je null, musí se ověřit, zda je některá hodnota varchar
+            elif res == "null":
+                if any(x.startswith('varchar') for x in col):
+                    res = "varchar"
+                else:
+                    # až když není výskyt varchar, bude hodnota integer,
+                    res = "integer"
+            # jinak bude typ s největší četností
+            else:
+                pass
+            self.deklarace.append(res)
 
     def uloz_data(self):
         """Uloží hlavičku do textového souboru."""
