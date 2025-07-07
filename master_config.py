@@ -1,4 +1,4 @@
 #!/usr/bin/env python3
 """konfigurační soubor"""
 
-SLOZKA = "test"
+SLOZKA = "r0503_icr"

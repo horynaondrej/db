@@ -14,7 +14,7 @@ def zjisti_nazvy_sloupcu(data):
         novy = re.sub(
             r"[áéíýóůúěščřž]",
             lambda x: x.group(0).translate(
-                str.maketrans("áéíýóůúěščřž", "aeiyouescrz")
+                str.maketrans("áéíýóůúěščřž", "aeiyouuescrz")
             ),
             novy,
         )
@@ -24,6 +24,10 @@ def zjisti_nazvy_sloupcu(data):
             .replace("-", "")
             .replace("(kc)", "")
             .replace("(h)", "")
+            .replace("(", "")
+            .replace(")", "")
+            .replace("/", "")
+            .replace("\\", "")
             .replace("[", "")
             .replace("]", "")
         )

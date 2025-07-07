@@ -112,7 +112,8 @@ def main():
     dotazy.append(
         """
         select * 
-        from t
+        from r0503_icr
+        limit 10
 
     """
     )

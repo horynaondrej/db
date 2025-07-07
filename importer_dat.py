@@ -61,6 +61,7 @@ class ImporterDat:
 
     def nahraj_data(self) -> None:
         """nahraj csv data do tabulky"""
+        logging.info("Začínám nahrávat a importovat data..")
         self.con.execute(
             f"""
             copy {self.tabulka}
@@ -69,6 +70,7 @@ class ImporterDat:
                 quote '"')
             """
         )
+        logging.info("Data úspěšně importovaná")
 
     def odeber_docasne_soubory(self):
         """odeber již nepotřebné soubory (už byly nahrané

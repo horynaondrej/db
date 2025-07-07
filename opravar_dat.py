@@ -37,7 +37,7 @@ class OpravarDat:
         self.uvozovky = None if config.UVOZOVKY == "None" else config.UVOZOVKY
         self.data = []
         self.hlavicka = []
-        self.data_nazvy = []
+        self.hlavicka_opravena = []
         self.retezec = ""
         self.hodnoty = ""
         self.prikaz_create = ""
@@ -57,6 +57,14 @@ class OpravarDat:
                 logging.info("Načtení dat dokončeno")
         except IOError as e:
             logging.info("Soubor s daty neexistuje %s", e)
+
+    def zkontroluj_data(self):
+        """zkontroluj délku a podobu dat"""
+        logging.info("Řádků: %s, Sloupců: %s", len(self.data), len(self.data[0]))
+
+        # kontrola počtu sloupců za řádek
+        unikatni_pocet_sloupcu = {len(zaznam) for zaznam in self.data}
+        logging.info("Kontrola sloupců, jen jedna hodnota: %s", unikatni_pocet_sloupcu)
 
     def nacti_prikaz_create(self):
         """je potřeba načíst i příkaz create,
@@ -120,7 +128,7 @@ class OpravarDat:
 
     def sjednot_data_a_hlavicku(self):
         """sloupci pro následné uložení hlavička a data"""
-        self.data = [self.hlavicka] + self.data
+        self.data = [self.hlavicka_opravena] + self.data
 
     def uloz_data(
         self, vystup: str, data: list[Any], oddelovac: str, uvozovky: str = None
@@ -161,8 +169,9 @@ def main():
 
     opravar_dat = OpravarDat()
     opravar_dat.nacti_data()
+    opravar_dat.zkontroluj_data()
     opravar_dat.rozdel_data()
-    opravar_dat.data_nazvy = zjisti_nazvy_sloupcu(opravar_dat.hlavicka)
+    opravar_dat.hlavicka_opravena = zjisti_nazvy_sloupcu(opravar_dat.hlavicka)
     opravar_dat.nacti_prikaz_create()
     opravar_dat.zpracuj_prikaz_create()
     opravar_dat.meritka = opravar_dat.zjisti_sloupce_podle_typu(["decimal"])
